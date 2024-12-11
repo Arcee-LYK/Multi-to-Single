@@ -3,7 +3,7 @@
 This is the demo code for paper "Multi-to-Single: Reducing Multimodal Dependency in Emotion Recognition
 through Contrastive Learning".
 
-We have provided the structure of the model and the basic process of pretraining and fine-tuning. The code contains partial data of a subject (demo.npz for EEG modality and demo for EYE modality).
+We have provided the structure of the model and the basic process of pretraining and fine-tuning. 
 
 `data.py`: This file contains the data loading and processing code.
 
