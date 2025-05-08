@@ -147,6 +147,55 @@ class Multi_to_Single(nn.Module):
         eye_semantic_result = self.eye_transform(eye_semantic_result)
         return eye_semantic_result
 
+    def same_eeg_modal(self, eeg_feat, eeg_label):
+        eeg_semantic = self.eeg_self_att(eeg_feat)
+        eeg_label_semantic = self.eeg_self_att(eeg_label)
+        eeg_semantic_result = eeg_semantic.mean(dim=1)
+        eeg_label_semantic_result = eeg_label_semantic.mean(dim=1)
+
+        eeg_semantic_result = self.eeg_transform(eeg_semantic_result)
+        eeg_label_semantic_result = self.eeg_transform(eeg_label_semantic_result)
+
+        eeg_semantic_result = eeg_semantic_result / eeg_semantic_result.norm(dim=-1, keepdim=True)
+        eeg_label_semantic_result = eeg_label_semantic_result / eeg_label_semantic_result.norm(dim=-1, keepdim=True)
+        logit_scale = self.logit_scale.exp()
+        logits_per_eeg_global = logit_scale * eeg_semantic_result @ eeg_label_semantic_result.t()
+        return logits_per_eeg_global
+
+    def same_eye_modal(self, eye_feat, eye_label):
+        eye_semantic = self.eye_self_att(eye_feat)
+        eye_label_semantic = self.eye_self_att(eye_label)
+        eye_semantic_result = eye_semantic.mean(dim=1)
+        eye_label_semantic_result = eye_label_semantic.mean(dim=1)
+
+        eye_semantic_result = self.eye_transform(eye_semantic_result)
+        eye_label_semantic_result = self.eye_transform(eye_label_semantic_result)
+
+        eye_semantic_result = eye_semantic_result / eye_semantic_result.norm(dim=-1, keepdim=True)
+        eye_label_semantic_result = eye_label_semantic_result / eye_label_semantic_result.norm(dim=-1, keepdim=True)
+        logit_scale = self.logit_scale.exp()
+        logits_per_eye_global = logit_scale * eye_semantic_result @ eye_label_semantic_result.t()
+        return logits_per_eye_global
+
+    def single_modal_forward(self, eeg_feat, eye_feat):
+        eeg_semantic = self.eeg_self_att(eeg_feat)
+        eye_semantic = self.eye_self_att(eye_feat)
+        eeg_semantic_result = eeg_semantic.mean(dim=1)
+        eye_semantic_result = eye_semantic.mean(dim=1)
+
+        eeg_semantic_result = self.eeg_transform(eeg_semantic_result)
+        eye_semantic_result = self.eye_transform(eye_semantic_result)
+
+        eeg_semantic_result = eeg_semantic_result / eeg_semantic_result.norm(dim=-1, keepdim=True)
+        eye_semantic_result = eye_semantic_result / eye_semantic_result.norm(dim=-1, keepdim=True)
+
+        # cosine similarity as logits
+        logit_scale = self.logit_scale.exp()
+        logits_per_eeg_global = logit_scale * eeg_semantic_result @ eye_semantic_result.t()
+        logits_per_eye_global = logits_per_eeg_global.t()
+
+        return logits_per_eeg_global ,logits_per_eye_global
+
     def forward(self, eeg_feat, eye_feat):
         # print("eeg_feat", eeg_feat.shape)
         eeg_ER_result = self.EEG_ER_encoder(eeg_feat)
