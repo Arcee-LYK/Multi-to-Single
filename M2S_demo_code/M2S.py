@@ -148,8 +148,8 @@ class Multi_to_Single(nn.Module):
         return eye_semantic_result
 
     def same_eeg_modal(self, eeg_feat, eeg_label):
-        eeg_semantic = self.eeg_self_att(eeg_feat)
-        eeg_label_semantic = self.eeg_self_att(eeg_label)
+        eeg_semantic = self.EEG_ER_encoder(eeg_feat)
+        eeg_label_semantic = self.EEG_ER_encoder(eeg_label)
         eeg_semantic_result = eeg_semantic.mean(dim=1)
         eeg_label_semantic_result = eeg_label_semantic.mean(dim=1)
 
@@ -163,8 +163,8 @@ class Multi_to_Single(nn.Module):
         return logits_per_eeg_global
 
     def same_eye_modal(self, eye_feat, eye_label):
-        eye_semantic = self.eye_self_att(eye_feat)
-        eye_label_semantic = self.eye_self_att(eye_label)
+        eye_semantic = self.Eye_ER_encoder(eye_feat)
+        eye_label_semantic = self.Eye_ER_encoder(eye_label)
         eye_semantic_result = eye_semantic.mean(dim=1)
         eye_label_semantic_result = eye_label_semantic.mean(dim=1)
 
@@ -178,8 +178,8 @@ class Multi_to_Single(nn.Module):
         return logits_per_eye_global
 
     def single_modal_forward(self, eeg_feat, eye_feat):
-        eeg_semantic = self.eeg_self_att(eeg_feat)
-        eye_semantic = self.eye_self_att(eye_feat)
+        eeg_semantic = self.EEG_ER_encoder(eeg_feat)
+        eye_semantic = self.Eye_ER_encoder(eye_feat)
         eeg_semantic_result = eeg_semantic.mean(dim=1)
         eye_semantic_result = eye_semantic.mean(dim=1)
 
